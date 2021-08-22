@@ -1,0 +1,44 @@
+#!/bin/bash
+#
+#Vars
+yum install unzip -y
+wget https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip && unzip ngrok-stable-linux-amd64.zip
+clear
+echo "Katacoda Centos Windows 11 by fb.com/thuong.hai.581"
+read -p "Paste authtoken here (Copy and Right-click to paste): " CRP
+./ngrok authtoken $CRP 
+nohup ./ngrok tcp --region eu 30889 &>/dev/null &
+yum install sudo -y
+echo "Downloading QEMU"
+sudo yum install -y qemu-kvm
+link1_status=$(curl -Is -k https://app.vagrantup.com/thuonghai2711/boxes/WindowsQCOW2/versions/1.0.2/providers/qemu.box | grep HTTP | cut -f2 -d" " | head -1)
+link2_status=$(curl -Is -k https://transfer.sh/1XQtaoZ/lite11.qcow2 | grep HTTP | cut -f2 -d" ")
+sudo wget -O lite11.qcow2 https://app.vagrantup.com/thuonghai2711/boxes/WindowsQCOW2/versions/1.0.2/providers/qemu.box
+[ -s lite11.qcow2 ] || sudo wget -O lite11.qcow2 https://transfer.sh/1XQtaoZ/lite11.qcow2
+availableRAMcommand="free -m | tail -2 | head -1 | awk '{print \$7}'"
+availableRAM=$(echo $availableRAMcommand | bash)
+custom_param_ram="-m "$(expr $availableRAM - 856 )"M"
+cpus=$(lscpu | grep CPU\(s\) | head -1 | cut -f2 -d":" | awk '{$1=$1;print}')
+nohup sudo /usr/libexec/qemu-kvm -nographic -net nic -net user,hostfwd=tcp::30889-:3389 -show-cursor $custom_param_ram -localtime -enable-kvm -cpu host,hv_relaxed,hv_spinlocks=0x1fff,hv_vapic,hv_time,+nx -M pc -smp cores=$cpus -vga std -machine type=pc,accel=kvm -usb -device usb-tablet -k en-us -drive file=lite11.qcow2,index=0,media=disk,format=qcow2 -boot once=d &>/dev/null &
+clear
+run: cmd /c
+net user SirMeti Milad12@ /add >nul
+net localgroup administrators SirMeti /add >nul
+net user SirMeti /active:yes >nul
+net user installer /delete
+diskperf -Y >nul
+sc config Audiosrv start= auto >nul
+sc start audiosrv >nul
+ICACLS C:\Windows\Temp /grant SirMeti:F >nul
+ICACLS C:\Windows\installer /grant SirMeti:F >nul
+echo Successfully Installed !, If the RDP is Dead, Please Rebuild Again!
+echo IP:
+tasklist | find /i "ngrok.exe" >Nul && curl -s localhost:4040/api/tunnels | jq -r .tunnels[0].public_url || echo "Tidak bisa mendapatkan NGROK tunnel, pastikan NGROK_AUTH_TOKEN benar di Settings> Secrets> Repository secret. Mungkin VM Anda sebelumnya masih berjalan: https://dashboard.ngrok.com/status/tunnels "
+echo Username: SirMeti
+echo Password: Milad12@
+echo Silahkan Login Ke RDP Anda!!
+ping -n 10 127.0.0.1 >nul
+
+
+
+
