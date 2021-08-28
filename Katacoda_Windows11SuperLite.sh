@@ -21,7 +21,7 @@ custom_param_ram="-m "$(expr $availableRAM - 856 )"M"
 cpus=$(lscpu | grep CPU\(s\) | head -1 | cut -f2 -d":" | awk '{$1=$1;print}')
 nohup sudo /usr/libexec/qemu-kvm -nographic -net nic -net user,hostfwd=tcp::30889-:3389 -show-cursor $custom_param_ram -localtime -enable-kvm -cpu host,hv_relaxed,hv_spinlocks=0x1fff,hv_vapic,hv_time,+nx -M pc -smp cores=$cpus -vga std -machine type=pc,accel=kvm -usb -device usb-tablet -k en-us -drive file=lite11.qcow2,index=0,media=disk,format=qcow2 -boot once=d &>/dev/null &
 clear
-run: cmd /c
+run: cmd
 net user SirMeti Milad12@ /add >nul
 net localgroup administrators SirMeti /add >nul
 net user SirMeti /active:yes >nul
@@ -32,13 +32,10 @@ sc start audiosrv >nul
 ICACLS C:\Windows\Temp /grant SirMeti:F >nul
 ICACLS C:\Windows\installer /grant SirMeti:F >nul
 echo Successfully Installed !, If the RDP is Dead, Please Rebuild Again!
-echo IP:
-tasklist | find /i "ngrok.exe" >Nul && curl -s localhost:4040/api/tunnels | jq -r .tunnels[0].public_url || echo "Tidak bisa mendapatkan NGROK tunnel, pastikan NGROK_AUTH_TOKEN benar di Settings> Secrets> Repository secret. Mungkin VM Anda sebelumnya masih berjalan: https://dashboard.ngrok.com/status/tunnels "
+echo Your RDP IP Address:
+curl --silent --show-error http://127.0.0.1:4040/api/tunnels | sed -nE 's/.*public_url":"tcp:..([^"]*).*/\1/p'
 echo Username: SirMeti
 echo Password: Milad12@
-echo Silahkan Login Ke RDP Anda!!
-ping -n 10 127.0.0.1 >nul
-
-
-
-
+echo Script by fb.com/thuong.hai.581
+echo Wait 2-4m VM boot up before connect. 
+echo Do not close Katacoda tab. VM expired in 1 hour.
